@@ -1,0 +1,291 @@
+/* Custom CSS for Project Evaluator */
+
+:root {
+    /* Primary colors */
+    --primary-green: #046B67;
+    --primary-blue: #9AC9D3;
+    --primary-navy: #232C55;
+    --primary-white: #FFFFFF;
+    --primary-black: #000000;
+    
+    /* Background colors */
+    --bg-light-green: #E1F1EF;
+    --bg-light-blue: #E5F3FB;
+    --bg-light-gray: #E3E3E3;
+    --bg-light-beige: #F5F2EF;
+    
+    /* Accent colors */
+    --accent-orange: #DC6137;
+    --accent-yellow: #F8C16D;
+    --accent-purple: #9C4174;
+    --accent-steel-blue: #6B90AA;
+}
+
+/* Override Bootstrap primary color */
+.btn-primary,
+.bg-primary {
+    background-color: var(--primary-green) !important;
+    border-color: var(--primary-green) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #035955 !important;
+    border-color: #035955 !important;
+}
+
+.text-primary {
+    color: var(--primary-green) !important;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* Custom orange color for progress bars */
+.bg-orange {
+    background-color: var(--accent-orange) !important;
+}
+
+/* Card shadows */
+.card.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Progress bars animation */
+.progress-bar {
+    transition: width 0.8s ease-in-out;
+}
+
+/* Suggestion cards */
+.suggestion-card {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Project row hover effect */
+.project-row:hover {
+    background-color: var(--bg-light-blue);
+    transition: background-color 0.2s ease;
+}
+
+/* Priority badges */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(4, 107, 103, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(4, 107, 103, 0.25);
+}
+
+/* Input group improvements */
+.input-group .btn {
+    border-left: 0;
+}
+
+.input-group .form-control {
+    border-right: 0;
+}
+
+.input-group .form-control:focus {
+    z-index: 3;
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+/* Accordion improvements */
+.accordion-button:not(.collapsed) {
+    background-color: var(--bg-light-green);
+    color: var(--primary-green);
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(4, 107, 103, 0.25);
+}
+
+/* Alert improvements */
+.alert {
+    border: none;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    border-left-color: #198754;
+    background-color: #d1e7dd;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+    background-color: #fff3cd;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.alert-info {
+    border-left-color: var(--primary-blue);
+    background-color: var(--bg-light-blue);
+}
+
+/* Breadcrumb improvements */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--primary-green);
+}
+
+.breadcrumb-item a {
+    color: var(--primary-green);
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .display-6 {
+        font-size: 2rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Custom spacing utilities */
+.mt-6 {
+    margin-top: 3rem;
+}
+
+.mb-6 {
+    margin-bottom: 3rem;
+}
+
+/* Table improvements */
+.table-hover tbody tr:hover {
+    background-color: var(--bg-light-blue);
+}
+
+/* Badge icons */
+.badge i {
+    font-size: 0.8em;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 400px;
+}
+
+/* Spinner improvements */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Tooltip improvements */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+/* Custom utility classes */
+.text-orange {
+    color: var(--accent-orange) !important;
+}
+
+.bg-light-green {
+    background-color: var(--bg-light-green) !important;
+}
+
+.bg-light-blue {
+    background-color: var(--bg-light-blue) !important;
+}
+
+.bg-light-beige {
+    background-color: var(--bg-light-beige) !important;
+}
+
+/* Focus indicators */
+.btn:focus,
+.form-control:focus,
+.form-select:focus {
+    outline: 2px solid var(--primary-green);
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .breadcrumb,
+    footer,
+    .btn,
+    .alert {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        break-inside: avoid;
+    }
+    
+    .accordion-collapse {
+        display: block !important;
+    }
+    
+    .accordion-button {
+        display: none !important;
+    }
+}

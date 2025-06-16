@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Nouveau Projet - {{ config.APP_NAME }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mt-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">Nouveau Projet</li>
+        </ol>
+    </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="bi bi-plus-circle me-2"></i>Créer un Nouveau Projet
+                </h4>
+            </div>
+            <div class="card-body">
+                <form id="projectForm" method="POST" action="{{ url_for('main.new_project') }}">
+                    <!-- Static Fields -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary border-bottom pb-2">Informations Générales</h5>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label for="titre" class="form-label">Titre du Projet <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="titre" name="titre" maxlength="200" required>
+                            <div class="form-text">Maximum 200 caractères</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="pvp" class="form-label">Département (PVP) <span class="text-danger">*</span></label>
+                            <select class="form-select" id="pvp" name="pvp" required>
+                                <option value="">Sélectionnez un département</option>
+                                {% for dept in departments %}
+                                    <option value="{{ dept }}">{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Evaluable Fields -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary border-bottom pb-2">Champs Évaluables</h5>
+                            <p class="text-muted small">Ces champs peuvent être améliorés grâce à l'IA avant la soumission finale.</p>
+                        </div>
+
+                        <!-- Contexte -->
+                        <div class="col-12 mb-4">
+                            <label for="contexte" class="form-label">Contexte d'Affaires <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <textarea class="form-control evaluable-field" id="contexte" name="contexte" rows="4" 
+                                         minlength="100" required placeholder="Décrivez le contexte et la justification du projet..."></textarea>
+                                <button type="button" class="btn btn-outline-primary improve-btn" 
+                                        data-field="contexte" data-field-label="Contexte d'affaires">
+                                    <i class="bi bi-lightbulb"></i> Évaluer
+                                </button>
+                            </div>
+                            <div class="form-text">Minimum 100 caractères</div>
+                            <div id="contexte-suggestion" class="suggestion-card mt-2" style="display: none;"></div>
+                        </div>
+
+                        <!-- Objectifs -->
+                        <div class="col-12 mb-4">
+                            <label for="objectifs" class="form-label">Objectifs du Projet <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <textarea class="form-control evaluable-field" id="objectifs" name="objectifs" rows="4" 
+                                         minlength="100" required placeholder="Définissez les objectifs clairs et mesurables..."></textarea>
+                                <button type="button" class="btn btn-outline-primary improve-btn" 
+                                        data-field="objectifs" data-field-label="Objectifs du projet">
+                                    <i class="bi bi-lightbulb"></i> Évaluer
+                                </button>
+                            </div>
+                            <div class="form-text">Minimum 100 caractères</div>
+                            <div id="objectifs-suggestion" class="suggestion-card mt-2" style="display: none;"></div>
+                        </div>
+
+                        <!-- Fonctionnalités -->
+                        <div class="col-12 mb-4">
+                            <label for="fonctionnalites" class="form-label">Fonctionnalités Principales <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <textarea class="form-control evaluable-field" id="fonctionnalites" name="fonctionnalites" rows="4" 
+                                         minlength="100" required placeholder="Listez les fonctionnalités principales à développer..."></textarea>
+                                <button type="button" class="btn btn-outline-primary improve-btn" 
+                                        data-field="fonctionnalites" data-field-label="Fonctionnalités principales">
+                                    <i class="bi bi-lightbulb"></i> Évaluer
+                                </button>
+                            </div>
+                            <div class="form-text">Minimum 100 caractères</div>
+                            <div id="fonctionnalites-suggestion" class="suggestion-card mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>Annuler
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="bi bi-check-circle me-2"></i>Soumettre pour Évaluation Complète
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <h5>Évaluation en cours...</h5>
+                <p class="text-muted">L'IA analyse votre projet selon les 6 critères d'évaluation.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-save functionality
+    const form = document.getElementById('projectForm');
+    const formData = JSON.parse(sessionStorage.getItem('projectFormData') || '{}');
+    
+    // Restore form data
+    Object.keys(formData).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+            element.value = formData[key];
+        }
+    });
+    
+    // Save form data on input
+    form.addEventListener('input', function(e) {
+        const formData = new FormData(form);
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        sessionStorage.setItem('projectFormData', JSON.stringify(data));
+    });
+    
+    // Clear saved data on successful submit
+    form.addEventListener('submit', function(e) {
+        // Show loading modal
+        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        loadingModal.show();
+        
+        // Clear saved data
+        sessionStorage.removeItem('projectFormData');
+    });
+    
+    // Field improvement functionality
+    document.querySelectorAll('.improve-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const fieldName = this.getAttribute('data-field');
+            const fieldLabel = this.getAttribute('data-field-label');
+            const fieldElement = document.getElementById(fieldName);
+            const suggestionElement = document.getElementById(fieldName + '-suggestion');
+            
+            if (!fieldElement.value.trim()) {
+                alert('Veuillez saisir du contenu avant de demander une amélioration.');
+                return;
+            }
+            
+            // Show loading state
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i> Amélioration...';
+            this.disabled = true;
+            
+            // Get project context
+            const projectContext = `Titre: ${document.getElementById('titre').value || ''}, Département: ${document.getElementById('pvp').value || ''}`;
+            
+            // Call improvement API
+            fetch('/api/improve-field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    field_name: fieldLabel,
+                    field_content: fieldElement.value,
+                    project_context: projectContext
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuggestion(suggestionElement, data.improved_content, fieldElement, data.original_content);
+                } else {
+                    alert('Erreur lors de l\'amélioration: ' + (data.error || 'Erreur inconnue'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la communication avec le serveur.');
+            })
+            .finally(() => {
+                // Reset button
+                this.innerHTML = '<i class="bi bi-lightbulb"></i> Évaluer';
+                this.disabled = false;
+            });
+        });
+    });
+    
+    function showSuggestion(suggestionElement, improvedContent, fieldElement, originalContent) {
+        suggestionElement.innerHTML = `
+            <div class="card border-success">
+                <div class="card-header bg-light">
+                    <h6 class="card-title mb-0 text-success">
+                        <i class="bi bi-lightbulb-fill me-2"></i>Suggestion d'Amélioration
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">${improvedContent}</p>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success btn-sm accept-suggestion">
+                            <i class="bi bi-check-lg me-1"></i>Accepter
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm reject-suggestion">
+                            <i class="bi bi-x-lg me-1"></i>Ignorer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        suggestionElement.style.display = 'block';
+        suggestionElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Accept suggestion
+        suggestionElement.querySelector('.accept-suggestion').addEventListener('click', function() {
+            fieldElement.value = improvedContent;
+            suggestionElement.style.display = 'none';
+            
+            // Show confirmation
+            const confirmation = document.createElement('div');
+            confirmation.className = 'alert alert-success alert-dismissible fade show mt-2';
+            confirmation.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>Amélioration acceptée et appliquée.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            suggestionElement.parentNode.insertBefore(confirmation, suggestionElement.nextSibling);
+            
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                if (confirmation.parentNode) {
+                    confirmation.remove();
+                }
+            }, 3000);
+            
+            // Trigger input event for auto-save
+            fieldElement.dispatchEvent(new Event('input'));
+        });
+        
+        // Reject suggestion
+        suggestionElement.querySelector('.reject-suggestion').addEventListener('click', function() {
+            suggestionElement.style.display = 'none';
+        });
+    }
+});
+</script>
+{% endblock %}

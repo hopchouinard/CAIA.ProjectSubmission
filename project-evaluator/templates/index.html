@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - {{ config.APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="display-6 text-primary">Tableau de Bord des Projets</h1>
+                <p class="lead text-muted">Gérez et évaluez vos projets d'investissement</p>
+            </div>
+            <div>
+                <a href="{{ url_for('main.new_project') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Nouveau Projet
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-up-circle fs-1 me-3"></i>
+                            <div>
+                                <h5 class="card-title">Priorité Élevée</h5>
+                                <h3 class="card-text">{{ projects | selectattr('priority_level', 'equalto', 'élevée') | list | length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-dash-circle fs-1 me-3"></i>
+                            <div>
+                                <h5 class="card-title">Priorité Moyenne</h5>
+                                <h3 class="card-text">{{ projects | selectattr('priority_level', 'equalto', 'moyenne') | list | length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-down-circle fs-1 me-3"></i>
+                            <div>
+                                <h5 class="card-title">Priorité Faible</h5>
+                                <h3 class="card-text">{{ projects | selectattr('priority_level', 'equalto', 'faible') | list | length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-question-circle fs-1 me-3"></i>
+                            <div>
+                                <h5 class="card-title">Non Évalués</h5>
+                                <h3 class="card-text">{{ projects | selectattr('priority_level', 'equalto', 'non-évalué') | list | length }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ul me-2"></i>Liste des Projets
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if projects %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Département (PVP)</th>
+                                    <th>Score Final</th>
+                                    <th>Priorité</th>
+                                    <th>Action</th>
+                                    <th>Date de Création</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects %}
+                                <tr class="project-row" data-href="{{ url_for('main.project_detail', id=project.id) }}" style="cursor: pointer;">
+                                    <td>
+                                        <strong>{{ project.titre }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ project.pvp }}</span>
+                                    </td>
+                                    <td>
+                                        {% if project.latest_evaluation %}
+                                            <span class="fw-bold text-primary">{{ project.latest_evaluation.score_final | format_score }}</span>
+                                            <small class="text-muted">/10</small>
+                                        {% else %}
+                                            <span class="text-muted">Non évalué</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="{{ project.priority_badge_class }}">
+                                            {% if project.priority_level == 'élevée' %}
+                                                <i class="bi bi-arrow-up-circle me-1"></i>
+                                            {% elif project.priority_level == 'moyenne' %}
+                                                <i class="bi bi-dash-circle me-1"></i>
+                                            {% elif project.priority_level == 'faible' %}
+                                                <i class="bi bi-arrow-down-circle me-1"></i>
+                                            {% else %}
+                                                <i class="bi bi-question-circle me-1"></i>
+                                            {% endif %}
+                                            {{ project.priority_text }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ project.action_text }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ project.created_at | format_date }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.project_detail', id=project.id) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           onclick="event.stopPropagation();">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if project.latest_evaluation %}
+                                            <a href="{{ url_for('main.reevaluate_project', id=project.id) }}" 
+                                               class="btn btn-sm btn-outline-secondary" 
+                                               onclick="event.stopPropagation();"
+                                               title="Réévaluer le projet">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <h4 class="text-muted mt-3">Aucun projet trouvé</h4>
+                        <p class="text-muted">Commencez par créer votre premier projet d'investissement.</p>
+                        <a href="{{ url_for('main.new_project') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Créer un Projet
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make table rows clickable
+    const projectRows = document.querySelectorAll('.project-row');
+    projectRows.forEach(row => {
+        row.addEventListener('click', function() {
+            const href = this.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

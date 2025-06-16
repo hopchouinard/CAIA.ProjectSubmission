@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.titre }} - {{ config.APP_NAME }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="mt-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Accueil</a></li>
+            <li class="breadcrumb-item active">{{ project.titre }}</li>
+        </ol>
+    </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">{{ project.titre }}</h4>
+                    {% if evaluation %}
+                        <span class="{{ project.priority_badge_class }}">
+                            {% if project.priority_level == 'élevée' %}
+                                <i class="bi bi-arrow-up-circle me-1"></i>
+                            {% elif project.priority_level == 'moyenne' %}
+                                <i class="bi bi-dash-circle me-1"></i>
+                            {% elif project.priority_level == 'faible' %}
+                                <i class="bi bi-arrow-down-circle me-1"></i>
+                            {% else %}
+                                <i class="bi bi-question-circle me-1"></i>
+                            {% endif %}
+                            {{ project.priority_text }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Project Info -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Département (PVP)</h6>
+                        <p>{{ project.pvp }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="text-muted">Date de Création</h6>
+                        <p>{{ project.created_at | format_date }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        {% if evaluation %}
+                            <h6 class="text-muted">Score Final</h6>
+                            <h4 class="text-primary">{{ evaluation.score_final | format_score }}<small class="text-muted">/10</small></h4>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Non évalué
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Required -->
+                {% if evaluation %}
+                <div class="alert {% if project.priority_level == 'élevée' %}alert-danger{% elif project.priority_level == 'moyenne' %}alert-warning{% else %}alert-success{% endif %} mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-info-circle fs-4 me-3"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">Action Recommandée</h6>
+                            <p class="mb-0">{{ project.action_text }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Project Details -->
+                <div class="accordion" id="projectAccordion">
+                    <!-- Contexte -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#contexte">
+                                <i class="bi bi-file-text me-2"></i>Contexte d'Affaires
+                            </button>
+                        </h2>
+                        <div id="contexte" class="accordion-collapse collapse show" data-bs-parent="#projectAccordion">
+                            <div class="accordion-body">
+                                {{ project.contexte }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Objectifs -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#objectifs">
+                                <i class="bi bi-bullseye me-2"></i>Objectifs du Projet
+                            </button>
+                        </h2>
+                        <div id="objectifs" class="accordion-collapse collapse" data-bs-parent="#projectAccordion">
+                            <div class="accordion-body">
+                                {{ project.objectifs }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fonctionnalités -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fonctionnalites">
+                                <i class="bi bi-gear me-2"></i>Fonctionnalités Principales
+                            </button>
+                        </h2>
+                        <div id="fonctionnalites" class="accordion-collapse collapse" data-bs-parent="#projectAccordion">
+                            <div class="accordion-body">
+                                {{ project.fonctionnalites }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Défis Techniques -->
+                    {% if project.defis_techniques %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#defis">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Défis Techniques Identifiés
+                            </button>
+                        </h2>
+                        <div id="defis" class="accordion-collapse collapse" data-bs-parent="#projectAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    {% for defi in project.defis_techniques | split_lines %}
+                                        {% if defi.strip() %}
+                                            <li class="mb-2">
+                                                <i class="bi bi-dot text-warning"></i>{{ defi.strip() }}
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Duration -->
+                {% if project.duree_estimee %}
+                <div class="mt-4">
+                    <h6 class="text-muted">Durée Estimée</h6>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar-check text-primary fs-4 me-2"></i>
+                        <span class="fs-5">{{ project.duree_estimee }} jours ouvrables</span>
+                        <small class="text-muted ms-2">(environ {{ (project.duree_estimee / 20) | round(1) }} mois)</small>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Retour à la Liste
+                    </a>
+                    {% if evaluation %}
+                        <a href="{{ url_for('main.reevaluate_project', id=project.id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Réévaluer le Projet
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        {% if evaluation %}
+        <!-- Evaluation Summary -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>Évaluation Détaillée
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Score Bars -->
+                <div class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Valeur Business (25%)</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-primary" style="width: {{ (evaluation.valeur_business / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.valeur_business | format_score }}/10</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Faisabilité Technique (20%)</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" style="width: {{ (evaluation.faisabilite_technique / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.faisabilite_technique | format_score }}/10</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Effort Requis (15%) 
+                                <i class="bi bi-info-circle" title="Plus le score est élevé, moins l'effort est important"></i>
+                            </label>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" style="width: {{ (evaluation.effort_requis / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.effort_requis | format_score }}/10</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Niveau de Risque (15%) 
+                                <i class="bi bi-info-circle" title="Plus le score est élevé, moins le risque est important"></i>
+                            </label>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" style="width: {{ (evaluation.niveau_risque / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.niveau_risque | format_score }}/10</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Urgence (15%)</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-orange" style="width: {{ (evaluation.urgence / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.urgence | format_score }}/10</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Alignement Stratégique (10%)</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" style="width: {{ (evaluation.alignement_strategique / 10 * 100) }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ evaluation.alignement_strategique | format_score }}/10</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-radar me-2"></i>Analyse Radar
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="radarChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+        <!-- Suggestions -->
+        {% if evaluation.get_suggestions() %}
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>Suggestions d'Amélioration
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="suggestionsAccordion">
+                    {% set suggestions = evaluation.get_suggestions() %}
+                    {% for criterion, suggestion in suggestions.items() %}
+                        {% if suggestion %}
+                        <div class="accordion-item border-0 mb-2">
+                            <h6 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#suggestion-{{ loop.index }}">
+                                    {% if criterion == 'valeur_business' %}
+                                        <i class="bi bi-graph-up text-primary me-2"></i>Valeur Business
+                                    {% elif criterion == 'faisabilite_technique' %}
+                                        <i class="bi bi-gear text-info me-2"></i>Faisabilité Technique
+                                    {% elif criterion == 'effort_requis' %}
+                                        <i class="bi bi-clock text-warning me-2"></i>Effort Requis
+                                    {% elif criterion == 'niveau_risque' %}
+                                        <i class="bi bi-shield text-danger me-2"></i>Niveau de Risque
+                                    {% elif criterion == 'urgence' %}
+                                        <i class="bi bi-hourglass text-orange me-2"></i>Urgence
+                                    {% elif criterion == 'alignement_strategique' %}
+                                        <i class="bi bi-bullseye text-success me-2"></i>Alignement Stratégique
+                                    {% endif %}
+                                </button>
+                            </h6>
+                            <div id="suggestion-{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#suggestionsAccordion">
+                                <div class="accordion-body small">
+                                    {{ suggestion }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <!-- No Evaluation -->
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+                <h5 class="mt-3">Projet Non Évalué</h5>
+                <p class="text-muted">Ce projet n'a pas encore été évalué par l'IA.</p>
+                <a href="{{ url_for('main.reevaluate_project', id=project.id) }}" class="btn btn-primary">
+                    <i class="bi bi-play-circle me-2"></i>Lancer l'Évaluation
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if evaluation %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Radar Chart
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: {{ evaluation.criteria_labels | tojson }},
+            datasets: [{
+                label: 'Score',
+                data: {{ evaluation.criteria_scores | tojson }},
+                backgroundColor: 'rgba(4, 107, 103, 0.2)',
+                borderColor: 'rgba(4, 107, 103, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(4, 107, 103, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(4, 107, 103, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: {
+                        stepSize: 2
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    angleLines: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}
