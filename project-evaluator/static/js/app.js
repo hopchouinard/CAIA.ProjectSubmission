@@ -76,18 +76,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
             textarea.addEventListener('input', updateCounter);
             updateCounter();
-        }
-    });
+        }    });
 
-    // Progress bar animations
+    // Progress bars - no animation, display final values directly
+    // Animation removed to show bars at their final values immediately
+    /*
     const progressBars = document.querySelectorAll('.progress-bar');
     const animateProgressBars = () => {
-        progressBars.forEach(bar => {
-            const width = bar.style.width;
+        progressBars.forEach((bar, index) => {
+            // Stocker la largeur finale
+            const finalWidth = bar.style.width;
+            
+            // S'assurer que la transition CSS est active
+            bar.style.transition = 'width 1.2s ease-out';
+            
+            // Commencer à 0% immédiatement
             bar.style.width = '0%';
+            
+            // Forcer un reflow pour s'assurer que le changement de largeur à 0% est appliqué
+            bar.offsetHeight;
+            
+            // Animer chaque barre avec un petit délai séquentiel vers la valeur finale
             setTimeout(() => {
-                bar.style.width = width;
-            }, 100);
+                bar.style.width = finalWidth;
+            }, 100 + (index * 200));
         });
     };
 
@@ -109,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     progressBars.forEach(bar => {
         progressObserver.observe(bar.parentElement);
     });
+    */
 
     // Loading states for buttons
     const loadingButtons = document.querySelectorAll('[data-loading-text]');

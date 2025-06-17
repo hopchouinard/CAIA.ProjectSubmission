@@ -21,7 +21,7 @@ class OpenAIService:
         try:
             # Use legacy OpenAI API (0.28.x)
             response = openai.ChatCompletion.create(
-                model="gpt-4",  # Use gpt-4 instead of gpt-4o for better compatibility
+                model="gpt-4.1",  # Use gpt-4.1 for better compatibility
                 messages=[
                     {
                         "role": "system",
@@ -73,7 +73,7 @@ Répondez uniquement avec le texte amélioré, sans explication additionnelle.
         try:
             # Use legacy OpenAI API
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model="gpt-4.1",
                 messages=[
                     {
                         "role": "system",

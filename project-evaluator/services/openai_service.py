@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 class OpenAIService:
     def __init__(self, api_key: str):
         """Initialize OpenAI service with API key"""
-        # Set the API key for legacy OpenAI library (0.28.x)
-        openai.api_key = api_key
+        # Initialize the OpenAI client (v1.0+)
+        self.client = openai.OpenAI(api_key=api_key)
     
     def evaluate_project(self, project_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -19,9 +19,9 @@ class OpenAIService:
         prompt = self._build_evaluation_prompt(project_data)
         
         try:
-            # Use legacy OpenAI API (0.28.x)
-            response = openai.ChatCompletion.create(
-                model="gpt-4",  # Use gpt-4 instead of gpt-4o for better compatibility
+            # Use modern OpenAI API (v1.0+)
+            response = self.client.chat.completions.create(
+                model="gpt-4.1",
                 messages=[
                     {
                         "role": "system",
@@ -71,9 +71,9 @@ Répondez uniquement avec le texte amélioré, sans explication additionnelle.
 """
         
         try:
-            # Use legacy OpenAI API
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
+            # Use modern OpenAI API
+            response = self.client.chat.completions.create(
+                model="gpt-4.1",
                 messages=[
                     {
                         "role": "system",

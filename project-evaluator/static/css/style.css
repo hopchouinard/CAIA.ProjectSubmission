@@ -53,9 +53,18 @@
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Progress bars animation */
+/* Progress bars - no animation, display final values immediately */
 .progress-bar {
-    transition: width 0.8s ease-in-out;
+    /* Transition removed to display bars at final values instantly */
+    /* transition: width 1.2s ease-out; */
+    transform-origin: left center;
+}
+
+/* Ensure clean display for progress bars */
+.progress {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 0.375rem;
+    overflow: hidden;
 }
 
 /* Suggestion cards */
