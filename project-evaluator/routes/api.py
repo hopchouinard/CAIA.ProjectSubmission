@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from models import db, Project, Evaluation
-from services import OpenAIService
+from services import AIService
 import logging
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -40,11 +40,10 @@ def create_project():
         
         db.session.add(project)
         db.session.commit()
-        
-        # Evaluate project
+          # Evaluate project
         try:
-            openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-            evaluation_result = openai_service.evaluate_project(data)
+            ai_service = AIService()
+            evaluation_result = ai_service.evaluate_project(data)
             
             # Update project with AI-generated fields
             project.defis_techniques = '\n'.join(evaluation_result.get('defis_techniques', []))
@@ -103,10 +102,9 @@ def improve_field():
         
         if not field_name or not field_content:
             return jsonify({'error': 'field_name et field_content sont requis'}), 400
-        
-        # Get improvement suggestion
-        openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-        improved_content = openai_service.improve_field(field_name, field_content, project_context)
+          # Get improvement suggestion
+        ai_service = AIService()
+        improved_content = ai_service.improve_field(field_name, field_content, project_context)
         
         return jsonify({
             'success': True,
@@ -127,10 +125,9 @@ def reevaluate_project_api(project_id):
     """API endpoint to reevaluate a project"""
     try:
         project = Project.query.get_or_404(project_id)
-        
-        # Evaluate project
-        openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-        evaluation_result = openai_service.evaluate_project({
+          # Evaluate project
+        ai_service = AIService()
+        evaluation_result = ai_service.evaluate_project({
             'titre': project.titre,
             'pvp': project.pvp,
             'contexte': project.contexte,

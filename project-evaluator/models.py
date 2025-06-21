@@ -168,3 +168,55 @@ class Evaluation(db.Model):
             'Urgence',
             'Alignement Stratégique'
         ]
+
+
+class AIProviderConfig(db.Model):
+    """Configuration for AI providers at runtime"""
+    __tablename__ = 'ai_provider_configs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column(db.String(50), nullable=False)
+    model = db.Column(db.String(100), nullable=False)
+    is_active = db.Column(db.Boolean, default=False)
+    priority = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Additional configuration as JSON
+    config_data = db.Column(db.Text)  # JSON string for provider-specific config
+    
+    def get_config_data(self):
+        """Parse config data from JSON"""
+        if self.config_data:
+            try:
+                return json.loads(self.config_data)
+            except json.JSONDecodeError:
+                return {}
+        return {}
+    
+    def set_config_data(self, config_dict):
+        """Store config data as JSON"""
+        self.config_data = json.dumps(config_dict, ensure_ascii=False)
+    
+    def to_dict(self):
+        """Convert provider config to dictionary"""
+        return {
+            'id': self.id,
+            'provider': self.provider,
+            'model': self.model,
+            'is_active': self.is_active,
+            'priority': self.priority,
+            'config_data': self.get_config_data(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    @classmethod
+    def get_active_providers(cls):
+        """Get all active providers ordered by priority"""
+        return cls.query.filter_by(is_active=True).order_by(cls.priority.asc()).all()
+    
+    @classmethod
+    def get_primary_provider(cls):
+        """Get the primary (highest priority) active provider"""
+        return cls.query.filter_by(is_active=True).order_by(cls.priority.asc()).first()

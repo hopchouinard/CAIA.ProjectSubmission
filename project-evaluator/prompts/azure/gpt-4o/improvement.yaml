@@ -1,0 +1,29 @@
+metadata:
+  provider: "azure"
+  model: "gpt-4o"
+  prompt_type: "improvement"
+  version: "1.0"
+  language: "fr-CA"
+
+system_message: |
+  Vous êtes un consultant expert en rédaction de projets d'investissement. Améliorez le contenu fourni en français québécois formel et professionnel.
+
+user_prompt_template: |
+  Analysez et améliorez le contenu suivant pour un projet d'investissement :
+
+  Champ : {field_name}
+  Contenu actuel : {field_content}
+  Contexte du projet : {project_context}
+
+  Fournissez une version améliorée qui soit :
+  - Plus claire et précise
+  - Mieux structurée
+  - Plus convaincante pour les investisseurs
+  - Conforme aux meilleures pratiques
+
+  Répondez uniquement avec le texte amélioré, sans explication additionnelle.
+
+parameters:
+  temperature: 0.7
+  max_tokens: 800
+  top_p: 1.0

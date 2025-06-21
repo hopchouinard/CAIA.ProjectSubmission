@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from models import db, Project, Evaluation
-from services import OpenAIService
+from services import AIService
 import logging
 
 main_bp = Blueprint('main', __name__)
@@ -70,11 +70,10 @@ def new_project():
             
             db.session.add(project)
             db.session.commit()
-            
-            # Evaluate the project using OpenAI
+              # Evaluate the project using AI service
             try:
-                openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-                evaluation_result = openai_service.evaluate_project({
+                ai_service = AIService()
+                evaluation_result = ai_service.evaluate_project({
                     'titre': titre,
                     'pvp': pvp,
                     'contexte': contexte,
@@ -136,10 +135,9 @@ def reevaluate_project(id):
     """Reevaluate an existing project"""
     try:
         project = Project.query.get_or_404(id)
-        
-        # Evaluate the project using OpenAI
-        openai_service = OpenAIService(current_app.config['OPENAI_API_KEY'])
-        evaluation_result = openai_service.evaluate_project({
+          # Evaluate the project using AI service
+        ai_service = AIService()
+        evaluation_result = ai_service.evaluate_project({
             'titre': project.titre,
             'pvp': project.pvp,
             'contexte': project.contexte,

@@ -1,0 +1,67 @@
+metadata:
+  provider: "openai"
+  model: "o3-2025-04-16"
+  prompt_type: "evaluation"
+  version: "1.0"
+  language: "fr-CA"
+  special_handling: "thinking_model"
+
+# Note: o1 models don't support system messages or temperature
+system_message: ""
+
+user_prompt_template: |
+  Vous êtes un expert en évaluation de projets d'investissement technologique. Analysez ce projet selon 6 critères spécifiques et fournissez des suggestions en français québécois formel. Répondez uniquement en JSON valide.
+
+  Évaluez ce projet d'investissement selon les 6 critères suivants (score de 1 à 10) :
+
+  PROJET À ÉVALUER :
+  Titre : {titre}
+  Département PVP : {pvp}
+  Contexte : {contexte}
+  Objectifs : {objectifs}
+  Fonctionnalités : {fonctionnalites}
+
+  CRITÈRES D'ÉVALUATION :
+  1. Valeur Business (25%) : Impact et ROI pour l'entreprise (1=faible, 10=très élevé)
+  2. Faisabilité Technique (20%) : Complexité et maturité technologique (1=très difficile, 10=très faisable)
+  3. Effort Requis (15%) : Ressources et temps nécessaires (1=effort énorme, 10=effort minimal)
+  4. Niveau de Risque (15%) : Risques techniques, légaux, éthiques (1=très risqué, 10=très sûr)
+  5. Urgence (15%) : Pression temporelle et opportunité (1=pas urgent, 10=très urgent)
+  6. Alignement Stratégique (10%) : Cohérence avec les objectifs (1=pas aligné, 10=parfaitement aligné)
+
+  Répondez en JSON avec cette structure exacte :
+  {{
+    "scores": {{
+      "valeur_business": 7.5,
+      "faisabilite_technique": 6.0,
+      "effort_requis": 4.0,
+      "niveau_risque": 8.0,
+      "urgence": 5.5,
+      "alignement_strategique": 9.0
+    }},
+    "suggestions": {{
+      "valeur_business": "Suggestion d'amélioration pour la valeur business...",
+      "faisabilite_technique": "Suggestion pour améliorer la faisabilité...",
+      "effort_requis": "Suggestion pour optimiser l'effort...",
+      "niveau_risque": "Suggestion pour réduire les risques...",
+      "urgence": "Suggestion concernant l'urgence...",
+      "alignement_strategique": "Suggestion pour l'alignement stratégique..."
+    }},
+    "defis_techniques": [
+      "Défi technique 1",
+      "Défi technique 2",
+      "Défi technique 3"
+    ],
+    "duree_estimee": 180
+  }}
+
+  Assurez-vous que :
+  - Tous les scores sont entre 1.0 et 10.0
+  - Les suggestions sont spécifiques et actionables
+  - Les défis techniques sont réalistes
+  - La durée est en jours ouvrables
+  - Tout le texte est en français québécois formel
+
+parameters:
+  max_tokens: 4000
+  # Note: o1 models don't support temperature parameter

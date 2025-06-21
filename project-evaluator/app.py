@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from config import Config
-from models import db, Project, Evaluation
+from models import db, Project, Evaluation, AIProviderConfig
 from routes import main_bp, api_bp
 import logging
 import os
